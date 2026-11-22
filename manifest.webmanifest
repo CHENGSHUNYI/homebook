@@ -1,0 +1,16 @@
+{
+  "name": "家帳本 HomeBook",
+  "short_name": "家帳本",
+  "description": "記錄貴重物品、消耗品、定期更換和紅包，和家人一起同步，到期自動提醒。",
+  "lang": "zh-Hant",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f4ef",
+  "theme_color": "#f7f4ef",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
