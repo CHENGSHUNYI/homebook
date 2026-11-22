@@ -4,7 +4,7 @@ import { TEMPLATES, DEFAULT_CATEGORIES } from './templates.js';
 import { LocalStore, CloudStore, loadSettings, saveSettings, cloudConfigured, createFamily, joinFamily } from './store.js';
 import { downloadICS } from './ics.js';
 
-const VERSION = '0.1.0';
+const VERSION = '0.1.1';
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const n = (v) => (v === '' || v === null || v === undefined || isNaN(Number(v)) ? undefined : Number(v));
