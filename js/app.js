@@ -4,7 +4,7 @@ import { TEMPLATES, DEFAULT_CATEGORIES } from './templates.js';
 import { LocalStore, CloudStore, loadSettings, saveSettings, cloudConfigured, createFamily, joinFamily } from './store.js';
 import { downloadICS } from './ics.js';
 
-const VERSION = '0.1.1';
+const VERSION = '0.1.2';
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const n = (v) => (v === '' || v === null || v === undefined || isNaN(Number(v)) ? undefined : Number(v));
@@ -223,6 +223,7 @@ function viewSettings() {
     <section class="box"><h3>我是誰</h3><p class="muted small">新增或修改紀錄時，會顯示是誰記的。</p>
       <input id="me" value="${esc(settings.me)}" placeholder="例如：老公、老婆"></section>
     <section class="box"><h3>👨‍👩‍👧 家庭共享</h3>${fam}</section>
+    ${appearanceBox()}
     <section class="box"><h3>🔔 提醒</h3>
       <p class="muted small">App 內的「今天」頁會自動列出到期項目。想要 iPhone 跳通知，可以把到期日匯出到「行事曆」（每筆會在前一天早上 9 點和 7 天前提醒）。</p>
       <div class="btns"><button class="btn" data-act="ics-all">匯出全部提醒到行事曆</button></div></section>
@@ -231,6 +232,28 @@ function viewSettings() {
       <button class="btn" data-act="trash">垃圾桶（${trash}）</button></div>
       <input type="file" id="importFile" accept="application/json,.json" hidden></section>
     <p class="muted small center">家帳本 HomeBook v${VERSION}</p>`;
+}
+
+// ---------- 外觀 ----------
+const ACCENTS = [
+  ['warm', '暖橘', '#d9480f'], ['rose', '玫瑰', '#c2255c'], ['forest', '森林', '#2b8a3e'],
+  ['ocean', '海洋', '#1971c2'], ['lavender', '薰衣草', '#6741d9'], ['ink', '簡約黑', '#212529'],
+];
+function applyTheme() {
+  const root = document.documentElement;
+  if (settings.theme && settings.theme !== 'auto') root.dataset.theme = settings.theme; else delete root.dataset.theme;
+  root.dataset.accent = settings.accent || 'warm';
+  // 讓 iPhone 狀態列顏色跟著背景
+  const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
+  document.querySelectorAll('meta[name=theme-color]').forEach((m) => m.remove());
+  const m = document.createElement('meta'); m.name = 'theme-color'; m.content = bg; document.head.appendChild(m);
+}
+function appearanceBox() {
+  const t = settings.theme || 'auto', a = settings.accent || 'warm';
+  return `<section class="box"><h3>🎨 外觀</h3>
+    <div class="seg">${[['auto', '跟隨系統'], ['light', '淺色'], ['dark', '深色']].map(([v, l]) => `<button class="${t === v ? 'on' : ''}" data-act="theme" data-v="${v}">${l}</button>`).join('')}</div>
+    <div class="swatches">${ACCENTS.map(([v, l, c]) => `<button class="${a === v ? 'on' : ''}" data-act="accent" data-v="${v}"><i style="background:${c}"></i>${l}</button>`).join('')}</div>
+    <p class="muted small">外觀只會套用在這支手機，另一半可以選自己喜歡的。</p></section>`;
 }
 
 // ---------- render ----------
@@ -540,6 +563,8 @@ async function switchToCloud(hid, mergeLocal) {
 
 const actions = {
   tab: (el) => go(el.dataset.v),
+  theme: (el) => { settings.theme = el.dataset.v; saveSettings(settings); applyTheme(); render(true); },
+  accent: (el) => { settings.accent = el.dataset.v; saveSettings(settings); applyTheme(); render(true); },
   'filter-go': (el) => { ui.type = el.dataset.v; ui.cat = ''; go('all'); },
   'filter-type': (el) => { ui.type = el.dataset.v; ui.cat = ''; render(); },
   'filter-cat': (el) => { ui.cat = el.dataset.v; render(); },
@@ -705,5 +730,7 @@ function toast(msg, actionLabel, actionFn) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), actionLabel ? 5000 : 2600);
 }
 
+applyTheme();
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyTheme);
 bindChrome();
 boot();

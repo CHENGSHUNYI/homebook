@@ -13,6 +13,12 @@
   <link rel="icon" href="icons/icon-192.png">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="css/app.css">
+  <script>
+    // 在畫面出現前套用外觀設定，避免閃一下預設顏色
+    try { var s = JSON.parse(localStorage.getItem('homebook.settings') || '{}');
+      if (s.theme && s.theme !== 'auto') document.documentElement.dataset.theme = s.theme;
+      if (s.accent) document.documentElement.dataset.accent = s.accent; } catch (e) {}
+  </script>
   <title>家帳本 HomeBook</title>
 </head>
 <body>

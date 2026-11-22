@@ -1,13 +1,39 @@
+/* ---------- 主題色（data-accent） ---------- */
+:root, :root[data-accent=warm] { --a-l: #d9480f; --a-d: #ff7a3d; --bg-l: #f7f4ef; --on-a-d: #fff; }
+:root[data-accent=rose]     { --a-l: #c2255c; --a-d: #f06595; --bg-l: #fbf3f5; }
+:root[data-accent=forest]   { --a-l: #2b8a3e; --a-d: #51cf66; --bg-l: #f1f6f0; --on-a-d: #0b1f0f; }
+:root[data-accent=ocean]    { --a-l: #1971c2; --a-d: #4dabf7; --bg-l: #f0f5fa; --on-a-d: #08192b; }
+:root[data-accent=lavender] { --a-l: #6741d9; --a-d: #9775fa; --bg-l: #f5f3fb; }
+:root[data-accent=ink]      { --a-l: #212529; --a-d: #e9ecef; --bg-l: #f4f4f3; --on-a-d: #111; }
+
+/* ---------- 淺色（預設） ---------- */
 :root {
-  --bg: #f7f4ef; --card: #fff; --text: #1f1d1a; --muted: #8a847b; --line: #ebe6de;
-  --accent: #d9480f; --accent-soft: #fff0e6; --red: #e03131; --red-soft: #fff0f0;
-  --orange: #e8890c; --orange-soft: #fff6e0; --green: #2f9e44; --chip: #efeae2;
+  color-scheme: light;
+  --bg: var(--bg-l); --card: #fff; --text: #1f1d1a; --muted: #857f76;
+  --accent: var(--a-l); --on-accent: #fff;
+  --red: #e03131; --red-soft: #fff0f0; --orange: #e8890c; --orange-soft: #fff6e0; --green: #2f9e44;
   --radius: 14px; --shadow: 0 1px 2px rgba(0,0,0,.05), 0 2px 8px rgba(0,0,0,.04);
   --safe-b: env(safe-area-inset-bottom, 0px); --safe-t: env(safe-area-inset-top, 0px);
 }
+:root {
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, var(--card));
+  --chip: color-mix(in srgb, var(--text) 7%, var(--bg));
+  --line: color-mix(in srgb, var(--text) 9%, var(--bg));
+}
+/* ---------- 深色：手動選擇，或跟隨系統 ---------- */
+:root[data-theme=dark] {
+  color-scheme: dark;
+  --bg: #151515; --card: #222120; --text: #f1eee9; --muted: #9a948b;
+  --accent: var(--a-d); --on-accent: var(--on-a-d, #fff);
+  --red-soft: #3a1c1c; --orange-soft: #3a2e15; --shadow: none;
+}
 @media (prefers-color-scheme: dark) {
-  :root { --bg: #151515; --card: #222120; --text: #f1eee9; --muted: #9a948b; --line: #33312e;
-    --accent: #ff7a3d; --accent-soft: #3a2418; --red-soft: #3a1c1c; --orange-soft: #3a2e15; --chip: #2e2c2a; --shadow: none; }
+  :root:not([data-theme=light]) {
+    color-scheme: dark;
+    --bg: #151515; --card: #222120; --text: #f1eee9; --muted: #9a948b;
+    --accent: var(--a-d); --on-accent: var(--on-a-d, #fff);
+    --red-soft: #3a1c1c; --orange-soft: #3a2e15; --shadow: none;
+  }
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; background: var(--bg); color: var(--text); }
@@ -73,7 +99,7 @@ mark { background: #ffe066; color: #000; border-radius: 3px; padding: 0 1px; }
 .chips.sub { padding-top: 0; }
 .chip { flex: none; padding: 6px 12px; border-radius: 99px; background: var(--chip); font-size: 14px; white-space: nowrap; }
 .chip.sm { padding: 4px 10px; font-size: 13px; }
-.chip.on { background: var(--accent); color: #fff; }
+.chip.on { background: var(--accent); color: var(--on-accent); }
 .listhead { display: flex; justify-content: space-between; align-items: center; margin: 4px 4px 8px; font-size: 13px; color: var(--muted); }
 .listhead select { border: 0; background: none; color: var(--accent); font-size: 14px; }
 
@@ -97,10 +123,10 @@ mark { background: #ffe066; color: #000; border-radius: 3px; padding: 0 1px; }
 .code { font: 700 26px/1.2 ui-monospace, Menlo, monospace; letter-spacing: 2px; text-align: center; padding: 12px; background: var(--bg); border-radius: 10px; margin: 8px 0; user-select: all; }
 .btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; } .btns.col { flex-direction: column; padding: 0 16px 16px; }
 .btn { padding: 10px 16px; border-radius: 12px; background: var(--chip); font-weight: 600; font-size: 15px; text-align: center; }
-.btn.primary { background: var(--accent); color: #fff; } .btn.danger { color: var(--red); }
+.btn.primary { background: var(--accent); color: var(--on-accent); } .btn.danger { color: var(--red); }
 .btn:disabled { opacity: .5; }
 
-#fab { position: fixed; right: max(18px, calc(50% - 302px)); bottom: calc(var(--safe-b) + 76px); width: 58px; height: 58px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 32px; line-height: 58px; text-align: center; box-shadow: 0 6px 16px rgba(217,72,15,.35); z-index: 20; }
+#fab { position: fixed; right: max(18px, calc(50% - 302px)); bottom: calc(var(--safe-b) + 76px); width: 58px; height: 58px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-size: 32px; line-height: 58px; text-align: center; box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 35%, transparent); z-index: 20; }
 #tabs { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-around; background: color-mix(in srgb, var(--card) 88%, transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--line); padding: 6px 0 calc(var(--safe-b) + 6px); z-index: 20; }
 #tabs button { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--muted); min-width: 64px; }
 #tabs button span { font-size: 22px; filter: grayscale(1); opacity: .6; }
@@ -159,3 +185,10 @@ dl div:last-child { border: 0; } dt { color: var(--muted); } dd { margin: 0; tex
 #toast { position: fixed; left: 50%; bottom: calc(var(--safe-b) + 150px); transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: #222; color: #fff; padding: 10px 16px; border-radius: 12px; font-size: 14px; z-index: 200; transition: .2s; display: flex; gap: 14px; align-items: center; max-width: 90vw; }
 #toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
 #toast button { color: #ffb38a; font-weight: 700; }
+
+/* ---------- 外觀設定 ---------- */
+.swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.swatches button { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 12px; background: var(--bg); border: 2px solid transparent; font-size: 14px; }
+.swatches button.on { border-color: var(--accent); font-weight: 600; }
+.swatches i { width: 22px; height: 22px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgba(0,0,0,.1); }
+.box .seg { margin-top: 6px; }
