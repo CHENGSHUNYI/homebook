@@ -1,5 +1,5 @@
 // 離線快取：先用快取秒開，背景再更新
-const CACHE = 'homebook-v1';
+const CACHE = 'homebook-v2';
 const SHELL = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/logic.js', 'js/store.js', 'js/templates.js', 'js/ics.js', 'js/firebase-config.js',
   'manifest.webmanifest', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 
