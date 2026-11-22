@@ -3,8 +3,9 @@ import * as L from './logic.js';
 import { TEMPLATES, DEFAULT_CATEGORIES } from './templates.js';
 import { LocalStore, CloudStore, loadSettings, saveSettings, cloudConfigured, createFamily, joinFamily } from './store.js';
 import { downloadICS } from './ics.js';
+import { buildSamples } from './sample.js';
 
-const VERSION = '0.1.3';
+const VERSION = '0.1.4';
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const n = (v) => (v === '' || v === null || v === undefined || isNaN(Number(v)) ? undefined : Number(v));
@@ -44,6 +45,7 @@ function scheduleRender() {
     if (sheet?.kind === 'detail') { if (store.get(sheet.id) && !store.get(sheet.id).deleted) showDetail(sheet.id, true); else closeSheet(); }
   });
 }
+const sampleCount = () => store.all().filter((r) => r.sample && !r.deleted).length;
 const live = () => store.all().filter((r) => !r.deleted);
 
 // ---------- 共用元件 ----------
@@ -119,11 +121,13 @@ function viewToday() {
   const section = (title, list, cls) => list.length ? `<h3 class="sec ${cls}">${title}<span>${list.length}</span></h3>${list.map(alertRow).join('')}` : '';
   const empty = !recs.length ? `<div class="empty">
       <div class="big">🏠</div><p>歡迎使用家帳本！<br>先記下第一件東西吧：</p>
-      <div class="grid4">${Object.entries(L.TYPES).map(([k, t]) => `<button data-act="new" data-v="${k}"><span>${t.icon}</span>${t.label}</button>`).join('')}</div></div>`
+      <div class="grid4">${Object.entries(L.TYPES).map(([k, t]) => `<button data-act="new" data-v="${k}"><span>${t.icon}</span>${t.label}</button>`).join('')}</div>
+      <p>不知道怎麼用？</p><button class="btn primary" data-act="sample-load">載入範例資料看看</button></div>`
     : (!overdue.length && !soon.length ? `<div class="ok-box">✅ 目前沒有需要處理的事</div>` : '');
 
   return `<header class="top"><div><small>${d.getMonth() + 1} 月 ${d.getDate()} 日 星期${'日一二三四五六'[d.getDay()]}</small><h1>家帳本</h1></div>${syncPill()}</header>
     ${iosHint}
+    ${sampleCount() ? `<div class="hint">👀 目前有 ${sampleCount()} 筆<b>範例資料</b>（標籤 #範例）。點進去看看、按按鈕試試，看懂後到「設定 → 資料」一鍵清除。</div>` : ''}
     <div class="stats">
       <button data-act="filter-go" data-v="asset"><b>${assets.length}</b><small>貴重物品</small><em>${L.money(total) || '$0'}</em></button>
       <button data-act="filter-go" data-v="consumable"><b>${cnt('consumable')}</b><small>消耗品</small></button>
@@ -230,6 +234,7 @@ function viewSettings() {
     <section class="box"><h3>💾 資料</h3>
       <div class="btns"><button class="btn" data-act="export">匯出備份</button><button class="btn" data-act="import">匯入備份</button>
       <button class="btn" data-act="trash">垃圾桶（${trash}）</button></div>
+      <div class="btns">${sampleCount() ? `<button class="btn danger" data-act="sample-clear">清除範例資料（${sampleCount()} 筆）</button>` : `<button class="btn" data-act="sample-load">載入範例資料</button>`}</div>
       <input type="file" id="importFile" accept="application/json,.json" hidden></section>
     <p class="muted small center">家帳本 HomeBook v${VERSION}</p>`;
 }
@@ -626,6 +631,18 @@ const actions = {
   trash: () => showTrash(),
   setme: (el) => { settings.me = el.dataset.v; saveSettings(settings); closeSheet(); render(true); toast(`你好，${settings.me}！`); },
   'setme-input': () => { const v = $('#meInput').value.trim(); if (!v) return; settings.me = v; saveSettings(settings); closeSheet(); render(true); },
+  'sample-load': async () => {
+    const shared = store.mode === 'cloud' ? '\n\n你已加入家庭，範例資料也會出現在另一半的手機上（清除時會一起清掉）。' : '';
+    if (!confirm('要載入範例資料嗎？會新增貴重物品、消耗品、定期更換、紅包各幾筆示範紀錄，之後可以一鍵清除。' + shared)) return;
+    await store.putMany(buildSamples(settings.me));
+    go('today'); toast('已載入範例資料，點任何一筆看看');
+  },
+  'sample-clear': async () => {
+    const list = store.all().filter((r) => r.sample);
+    if (!confirm(`要清除 ${list.length} 筆範例資料嗎？你自己新增的紀錄不會受影響。`)) return;
+    for (const r of list) await store.purge(r.id);
+    render(true); toast('範例資料已清除');
+  },
   'ics-all': () => downloadICS(live(), '家帳本提醒.ics'),
   'ics-one': (el) => { const r = store.get(el.dataset.id); downloadICS([r], `${r.name}.ics`); },
   export: () => {
