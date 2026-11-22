@@ -4,7 +4,7 @@ import { TEMPLATES, DEFAULT_CATEGORIES } from './templates.js';
 import { LocalStore, CloudStore, loadSettings, saveSettings, cloudConfigured, createFamily, joinFamily } from './store.js';
 import { downloadICS } from './ics.js';
 
-const VERSION = '0.1.2';
+const VERSION = '0.1.3';
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const n = (v) => (v === '' || v === null || v === undefined || isNaN(Number(v)) ? undefined : Number(v));
@@ -252,6 +252,7 @@ function appearanceBox() {
   const t = settings.theme || 'auto', a = settings.accent || 'warm';
   return `<section class="box"><h3>🎨 外觀</h3>
     <div class="seg">${[['auto', '跟隨系統'], ['light', '淺色'], ['dark', '深色']].map(([v, l]) => `<button class="${t === v ? 'on' : ''}" data-act="theme" data-v="${v}">${l}</button>`).join('')}</div>
+    ${t === 'auto' ? `<p class="muted small">偵測到手機目前是「${matchMedia('(prefers-color-scheme: dark)').matches ? '深色' : '淺色'}」模式，App 會跟著切換。</p>` : ''}
     <div class="swatches">${ACCENTS.map(([v, l, c]) => `<button class="${a === v ? 'on' : ''}" data-act="accent" data-v="${v}"><i style="background:${c}"></i>${l}</button>`).join('')}</div>
     <p class="muted small">外觀只會套用在這支手機，另一半可以選自己喜歡的。</p></section>`;
 }
@@ -731,6 +732,8 @@ function toast(msg, actionLabel, actionFn) {
 }
 
 applyTheme();
-matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyTheme);
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', () => { applyTheme(); if (ui.tab === 'settings') render(true); });
+// iOS 從背景回到前景時，重新確認系統深淺色
+document.addEventListener('visibilitychange', () => { if (!document.hidden) applyTheme(); });
 bindChrome();
 boot();

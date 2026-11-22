@@ -1,5 +1,5 @@
 // 離線快取：有網路時一律先抓最新版（避免看到舊版），沒網路才用快取
-const CACHE = 'homebook-v4';
+const CACHE = 'homebook-v5';
 const SHELL = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/logic.js', 'js/store.js', 'js/templates.js', 'js/ics.js', 'js/firebase-config.js',
   'manifest.webmanifest', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 
