@@ -1,5 +1,7 @@
 # 家帳本 HomeBook（暫定名稱）
 
+> 要接手開發？請先看 [DEVELOPER.md](DEVELOPER.md)。
+
 和另一半一起用的「生活記事＋提醒」App。目前先做成網頁 App（PWA），iPhone 用 Safari 開啟後「加入主畫面」，用起來就像一般 App。
 
 ## 功能
@@ -58,6 +60,7 @@ js/logic.js           日期計算、提醒判斷、搜尋
 js/store.js           本機（IndexedDB）／雲端（Firestore）儲存
 js/templates.js       常用範本（手機 5 年、牙刷 3 個月…）
 js/ics.js             匯出行事曆提醒
+js/sample.js          範例資料
 js/firebase-config.js Firebase 設定（自己填）
 firestore.rules       Firestore 安全規則
 sw.js                 離線快取
